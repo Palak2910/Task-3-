@@ -1,0 +1,7 @@
+opencv-python
+Pillow
+imagehash
+requests
+python-dotenv
+web3
+beautifulsoup4
