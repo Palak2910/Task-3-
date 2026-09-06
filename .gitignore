@@ -1,2 +1,22 @@
 .env
 *.json
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment / secrets
+.env
+
+# Local test images
+test.jpg
+test2.jpg
+test_resaved.jpg
+person2.jpg
+
+# Local ML models
+models/*.onnx
