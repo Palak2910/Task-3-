@@ -1,6 +1,3 @@
-.env
-*.json
-
 # Python
 __pycache__/
 *.py[cod]
@@ -12,7 +9,7 @@ venv/
 # Environment / secrets
 .env
 
-# Local test images
+# Local test images (consented, kept local-only)
 test.jpg
 test2.jpg
 test_resaved.jpg
