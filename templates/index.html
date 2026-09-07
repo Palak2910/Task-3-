@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Provenance &amp; Verification — Task-3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+<header class="topnav">
+  <div class="wrap">
+    <a href="#top" class="brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6l-9-4z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 12l2.5 2.5 4.5-5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      Provenance
+    </a>
+    <nav>
+      <a href="#verify">Verify</a>
+      <a href="#demo">Demo</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#tech">Technology</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow">HACKATHON DEMO · TASK-3</span>
+      <h1>Image Provenance<br>&amp; Verification</h1>
+      <p class="lede">Verify whether an image has a traceable web presence and tamper-evident provenance on the blockchain.</p>
+      <div class="hero-actions">
+        <a href="#verify" class="btn btn-primary">Verify an image</a>
+        <a href="#how-it-works" class="btn btn-secondary">How it works</a>
+      </div>
+      <div class="badge-row">
+        <span class="tech-badge"><span class="dot"></span>AI Face Verification</span>
+        <span class="tech-badge"><span class="dot"></span>Reverse Image Search</span>
+        <span class="tech-badge"><span class="dot"></span>SFace · YuNet</span>
+        <span class="tech-badge"><span class="dot"></span>Blockchain Provenance</span>
+        <span class="tech-badge"><span class="dot"></span>Ethereum Sepolia</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VERIFY / UPLOAD ================= -->
+  <section id="verify">
+    <div class="wrap">
+      <div class="verify-panel">
+        <h2>Verify an image</h2>
+        <p class="sub">Upload an image to run it through the full detection, search, and blockchain verification pipeline.</p>
+
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.bmp,.gif">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="primary-text">Drag &amp; drop an image here</div>
+          <div class="secondary-text">or click to browse</div>
+          <div class="formats">JPG · PNG · WEBP · BMP · GIF</div>
+        </div>
+
+        <div class="file-preview hidden" id="filePreview">
+          <img id="previewImg" src="" alt="Selected image preview">
+          <div class="meta">
+            <div class="fname" id="previewName"></div>
+            <div class="fsize" id="previewSize"></div>
+          </div>
+          <button class="btn btn-ghost" id="removeFile">Remove</button>
+        </div>
+
+        <div class="verify-cta">
+          <button class="btn btn-primary" id="verifyBtn" disabled>Verify Image</button>
+        </div>
+
+        <div class="error-banner" id="errorBanner">
+          <span>⚠</span>
+          <span id="errorText"></span>
+        </div>
+
+        <div class="info-banner" id="infoBanner">
+          <span>ℹ</span>
+          <span id="infoText"></span>
+        </div>
+
+        <!-- ================= LIVE PIPELINE ================= -->
+        <div class="pipeline" id="pipeline">
+          <div class="pipeline-title">Verification pipeline</div>
+          <div class="timeline" id="timeline">
+            <!-- steps injected by main.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= FINAL RESULT ================= -->
+      <div class="result-card" id="resultCard">
+        <div class="result-badge" id="resultBadge"></div>
+        <h3 id="resultHeadline"></h3>
+        <p class="explain" id="resultExplain"></p>
+        <div class="result-stats" id="resultStats"></div>
+      </div>
+
+      <!-- ================= MATCH DETAILS ================= -->
+      <div class="match-card" id="matchCard">
+        <h3 style="font-size:18px;margin-bottom:20px;">Match details</h3>
+        <div class="match-images">
+          <div class="match-image-slot">
+            <div class="frame"><img id="uploadedImg" src="" alt="Uploaded image"></div>
+            <div class="cap">Uploaded image</div>
+          </div>
+          <div class="match-image-slot">
+            <div class="frame" id="matchedFrame"><img id="matchedImg" src="" alt="Matched web image"></div>
+            <div class="cap">Matched web image</div>
+          </div>
+        </div>
+        <div class="similarity-bar-wrap">
+          <div class="similarity-row">
+            <span class="score" id="similarityScore"></span>
+            <span class="thresh">SFace cosine similarity · match threshold 0.363</span>
+          </div>
+          <div class="similarity-track"><div class="similarity-fill" id="similarityFill"></div></div>
+        </div>
+        <div class="kv-grid">
+          <div class="kv-item">
+            <div class="k">Source URL</div>
+            <div class="v" id="sourceUrlRow"></div>
+          </div>
+          <div class="kv-item">
+            <div class="k">Image URL</div>
+            <div class="v" id="imageUrlRow"></div>
+          </div>
+          <div class="kv-item">
+            <div class="k">SHA-256</div>
+            <div class="v" id="sha256Row"></div>
+          </div>
+          <div class="kv-item">
+            <div class="k">Perceptual hash</div>
+            <div class="v" id="phashRow"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= BLOCKCHAIN PROVENANCE ================= -->
+      <div class="chain-card" id="chainCard">
+        <div class="chain-head">
+          <h3>Blockchain provenance</h3>
+          <div class="chain-network"><span class="dot"></span>Ethereum Sepolia</div>
+        </div>
+        <div class="chain-grid">
+          <div class="chain-item">
+            <div class="k">Transaction</div>
+            <div class="v mono" id="txRow"></div>
+          </div>
+          <div class="chain-item">
+            <div class="k">Status</div>
+            <div class="v" id="statusRow"></div>
+          </div>
+          <div class="chain-item">
+            <div class="k">Block</div>
+            <div class="v" id="blockRow"></div>
+          </div>
+          <div class="chain-item">
+            <div class="k">Fingerprint match</div>
+            <div class="v" id="fpMatchRow"></div>
+          </div>
+          <div class="chain-item">
+            <div class="k">On-chain confirmation</div>
+            <div class="v" id="confirmRow"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DEMO CASES ================= -->
+  <section id="demo" class="tight">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Try the demo</h2>
+        <p>Run the real pipeline end-to-end. These cards don't return canned results — they run the same verification you'd get from any upload above.</p>
+      </div>
+      <div class="demo-grid">
+        <div class="demo-card positive">
+          <span class="tag">Positive case</span>
+          <h3>Positive verification</h3>
+          <p>Pick an image that already has a public presence online — a profile photo you know is indexed. A sufficiently similar face match, confirmed on-chain, will return VERIFIED.</p>
+          <button class="btn btn-secondary" id="demoPositive">Try positive case</button>
+        </div>
+        <div class="demo-card negative">
+          <span class="tag">Negative case</span>
+          <h3>Negative verification</h3>
+          <p>Pick an image that has never been posted publicly, or a face with no indexed match. This will correctly return NOT VERIFIED.</p>
+          <button class="btn btn-secondary" id="demoNegative">Try negative case</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HOW IT WORKS ================= -->
+  <section id="how-it-works">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>How it works</h2>
+        <p>Seven stages, each independently verifiable, from pixels to an on-chain record.</p>
+      </div>
+      <div class="how-grid">
+        <div class="how-item">
+          <div class="idx">01</div>
+          <h4>Face detection</h4>
+          <p>Find faces in the uploaded image.</p>
+        </div>
+        <div class="how-item">
+          <div class="idx">02</div>
+          <h4>Face embedding</h4>
+          <p>Convert facial features into a numerical representation.</p>
+        </div>
+        <div class="how-item">
+          <div class="idx">03</div>
+          <h4>Image fingerprint</h4>
+          <p>Generate SHA-256 and perceptual hashes.</p>
+        </div>
+        <div class="how-item">
+          <div class="idx">04</div>
+          <h4>Web search</h4>
+          <p>Find visually similar indexed images.</p>
+        </div>
+        <div class="how-item">
+          <div class="idx">05</div>
+          <h4>Face verification</h4>
+          <p>Compare candidate faces using SFace.</p>
+        </div>
+        <div class="how-item">
+          <div class="idx">06</div>
+          <h4>Blockchain provenance</h4>
+          <p>Record the winning image fingerprint.</p>
+        </div>
+        <div class="how-item">
+          <div class="idx">07</div>
+          <h4>Blockchain verification</h4>
+          <p>Retrieve and verify the recorded fingerprint and confirmation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TECHNOLOGY ================= -->
+  <section id="tech" class="tight">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Technology stack</h2>
+      </div>
+      <div class="tech-grid">
+        <span class="tech-pill"><span class="swatch"></span>OpenCV</span>
+        <span class="tech-pill"><span class="swatch"></span>YuNet</span>
+        <span class="tech-pill"><span class="swatch"></span>SFace</span>
+        <span class="tech-pill"><span class="swatch"></span>Reverse Image Search / SerpApi</span>
+        <span class="tech-pill"><span class="swatch"></span>SHA-256</span>
+        <span class="tech-pill"><span class="swatch"></span>Perceptual Hash</span>
+        <span class="tech-pill"><span class="swatch"></span>Ethereum Sepolia</span>
+        <span class="tech-pill"><span class="swatch"></span>Web3.py</span>
+        <span class="tech-pill"><span class="swatch"></span>Flask</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DISCLAIMER ================= -->
+  <section class="tight">
+    <div class="wrap">
+      <div class="disclaimer">
+        <strong>What this tool does and doesn't prove.</strong> Face recognition here measures visual similarity between faces, within a fixed threshold — it does not confirm a person's real-world identity. Blockchain registration provides a tamper-evident timestamp for an image fingerprint; it proves that a specific hash existed at a specific time and hasn't changed since, not that the underlying face match was correct. A result of NOT VERIFIED does not mean an image is fake — it means no sufficiently similar, on-chain-confirmed match was found within this tool's configured threshold. Treat every result as one signal among many, not as a definitive judgment.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Image Provenance &amp; Verification — Task-3</span>
+    <span>Hackathon demo build</span>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

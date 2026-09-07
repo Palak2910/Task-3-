@@ -4,3 +4,4 @@ imagehash
 requests
 python-dotenv
 web3
+Flask

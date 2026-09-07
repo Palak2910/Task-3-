@@ -142,6 +142,15 @@ def verify_web_candidates(source_image_path: str, candidates: List[Candidate]) -
             audit_trail.append(record)
             _safe_remove(downloaded)
             continue
+        except FileNotFoundError:
+            # Download succeeded (right Content-Type, under the size cap)
+            # but the file itself is corrupt/truncated/undecodable, so
+            # cv2.imread() inside get_face_embedding() returned None. This
+            # is a per-candidate problem, not a reason to abort the rest.
+            record["rejection_reason"] = "invalid_image"
+            audit_trail.append(record)
+            _safe_remove(downloaded)
+            continue
 
         record["face_detected"] = True
 
@@ -188,8 +197,10 @@ def verify_web_candidates(source_image_path: str, candidates: List[Candidate]) -
             "candidates": audit_trail,
         }
 
-    fingerprint = generate_fingerprint(best["temp_path"])
-    _safe_remove(best["temp_path"])
+    try:
+        fingerprint = generate_fingerprint(best["temp_path"])
+    finally:
+        _safe_remove(best["temp_path"])
 
     return {
         "matched": True,
